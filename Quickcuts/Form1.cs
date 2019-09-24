@@ -49,6 +49,7 @@ namespace Quickcuts
             Shortcut.defaultSize = arrow.Size;
             Shortcuts = new List<Shortcut>();
             GetShortcuts(Properties.Settings.Default.path);
+           
         }
 
 
@@ -91,6 +92,8 @@ namespace Quickcuts
                 arrow.Location = defaultArrowLocation;
             }
             this.TopMost = check;
+            Properties.Settings.Default.topMost = check;
+            Properties.Settings.Default.Save();
         }
         #endregion -----------------------------------------------------------------------
 
@@ -226,6 +229,10 @@ namespace Quickcuts
             
             defaultArrowSize = arrow.Size;
             defaultArrowLocation = arrow.Location;
+
+            this.SetStyle(ControlStyles.SupportsTransparentBackColor, true);
+            this.topMost(Properties.Settings.Default.topMost);
+
             if (!TopMost)
                 this.SendToBack();
         }
