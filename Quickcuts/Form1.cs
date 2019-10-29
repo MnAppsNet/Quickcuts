@@ -153,7 +153,10 @@ namespace Quickcuts
                 } while (!System.IO.File.Exists(ex) && !System.IO.Directory.Exists(ex));
                 System.IO.File.WriteAllText(sender.Tag.ToString() + @"\" + Click + "." + SettingsFileName, ex);
             }
-            System.Diagnostics.Process.Start(ex);
+            System.Diagnostics.Process process = new System.Diagnostics.Process();
+            process.StartInfo.FileName = ex;
+            process.StartInfo.WorkingDirectory = System.IO.Path.GetDirectoryName(ex);
+            process.Start();
         }
 
         public string GetClickActionPath(string Path, string Click)
