@@ -18,13 +18,13 @@ namespace Quickcuts
         private string path;
         private int index;
         private System.Windows.Forms.PictureBox shortcut;
-        private Form1 parent;
+        private Main parent;
         private System.Drawing.Size ZoomIconSize = new System.Drawing.Size(7, 7);
         System.Windows.Forms.Timer animator; //Used for zoom effect
         #endregion -----------------------------------------------------------------------
 
 
-        public Shortcut(Form1 Parent, int Index, string FolderName, string Path, System.Windows.Forms.PictureBox TemplateObject)
+        public Shortcut(Main Parent, int Index, string FolderName, string Path, System.Windows.Forms.PictureBox TemplateObject)
         { // Constructor \\
             parent = Parent;
             folderName = FolderName;

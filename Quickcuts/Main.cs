@@ -11,7 +11,7 @@ using Microsoft.VisualBasic;
 
 namespace Quickcuts
 {
-    public partial class Form1 : Form
+    public partial class Main : Form
     {
         #region Global Variables
         private const string SettingsFileName = "click.conf";
@@ -20,10 +20,14 @@ namespace Quickcuts
         private Size defaultArrowSize;
         private Point defaultArrowLocation;
         private Size OriginalSize;
+        //Variables to open and close the panel :
+        KeyboardHook Hook;
+        KeyboardHook.VKeys[] showShortcut = { KeyboardHook.VKeys.LCONTROL, KeyboardHook.VKeys.LSHIFT, KeyboardHook.VKeys.KEY_E }; 
+        KeyboardHook.VKeys[] hideShortcut = { KeyboardHook.VKeys.LCONTROL, KeyboardHook.VKeys.LSHIFT, KeyboardHook.VKeys.KEY_Q };
         #endregion -----------------------------------------------------------------------
 
 
-        public Form1()
+        public Main()
         { //Constructor
             InitializeComponent();
             //Check and get path to be used for shortcuts
@@ -52,18 +56,76 @@ namespace Quickcuts
            
         }
 
+        #region Keyboard Hooks 
+        //Keyboard Hook :
+        List<KeyboardHook.VKeys> vKeys = new List<KeyboardHook.VKeys>();
+        private void KeyDownHook(KeyboardHook.VKeys key)
+        {
+            try
+            {
+                if (vKeys[vKeys.Count - 1] == key) return;
+            }
+            catch { }
+
+            vKeys.Add(key);
+
+            if (vKeys.Count >= showShortcut.Length)
+            {
+                bool ok = true;
+
+                //Check Show Panel
+                foreach (KeyboardHook.VKeys k in showShortcut)
+                {
+                    if (!vKeys.Contains(k))
+                    {
+                        ok = false;
+                        break;
+                    }
+                }
+                if (ok)
+                {
+                    ChangeArrow("<");
+                    ShowProjets();
+                    GetShortcuts(Properties.Settings.Default.path);
+                }
+
+                //Check Hide Panel
+                ok = true;
+                foreach (KeyboardHook.VKeys k in hideShortcut)
+                {
+                    if (!vKeys.Contains(k))
+                    {
+                        ok = false;
+                        break;
+                    }
+                }
+                if (ok)
+                {
+                    ChangeArrow(">");
+                    HideProjects();
+                    GetShortcuts(Properties.Settings.Default.path);
+                }
+
+                vKeys.RemoveAt(vKeys.Count - 1);
+            }
+        }
+        private void KeyUpHook(KeyboardHook.VKeys key)
+        {
+            vKeys.Remove(key);
+        }
+        #endregion
 
         #region UI Functionality
-        private void ChangeArrow()
+        private void ChangeArrow(string direction)
         {
-            if (arrow.Tag.ToString() == ">")
-            {
-                arrow.Image = Properties.Resources.left;
-                arrow.Tag = "<";
-            }else
+            if (direction == ">")
             {
                 arrow.Image = Properties.Resources.right;
                 arrow.Tag = ">";
+            }else if (direction == "<")
+            {
+                arrow.Image = Properties.Resources.left;
+                arrow.Tag = "<";
             }
         }
         private void ShowProjets()
@@ -192,7 +254,7 @@ namespace Quickcuts
                         );
                     return;
                 }
-                ChangeArrow();
+                ChangeArrow("<");
                 ShowProjets();
                 GetShortcuts(Properties.Settings.Default.path);
             }
@@ -203,7 +265,7 @@ namespace Quickcuts
                     Application.Exit();
                     return;
                 }
-                ChangeArrow();
+                ChangeArrow(">");
                 HideProjects();
                 GetShortcuts(Properties.Settings.Default.path);
             }
@@ -238,6 +300,12 @@ namespace Quickcuts
 
             if (!TopMost)
                 this.SendToBack();
+
+            //KeyBoard Hook :
+            Hook = new KeyboardHook();
+            Hook.KeyDown += KeyDownHook;
+            Hook.KeyUp += KeyUpHook;
+            Hook.Install();
         }
         #endregion -----------------------------------------------------------------------
 
