@@ -10,8 +10,20 @@ namespace Quickcuts
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main()
+        static void Main(string[] args)
         {
+            if (args.Length >= 1)
+            {
+                if ( args[0] == "reset")
+                {
+                    if (Properties.Settings.Default.path != "")
+                    {
+                        Properties.Settings.Default.Reset();
+                        Properties.Settings.Default.Save();
+                        Application.Restart();
+                    }
+                }
+            }
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Main());

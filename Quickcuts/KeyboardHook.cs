@@ -354,10 +354,9 @@ public class KeyboardHook
 
     }
 
-
     private delegate IntPtr KeyboardHookHandler(int nCode, IntPtr wParam, IntPtr lParam);
 
-    private KeyboardHookHandler hookHandler;
+    private static KeyboardHookHandler hookHandler;
 
     public delegate void KeyboardHookCallback(VKeys key);
 
@@ -373,15 +372,13 @@ public class KeyboardHook
 
     public void Install()
     {
-        hookHandler = HookFunc;
+        hookHandler = new KeyboardHookHandler(HookFunc);
         hookID = SetHook(hookHandler);
     }
 
     public void Uninstall()
-
     {
         UnhookWindowsHookEx(hookID);
-
     }
 
     private IntPtr SetHook(KeyboardHookHandler proc)
@@ -394,12 +391,8 @@ public class KeyboardHook
     private IntPtr HookFunc(int nCode, IntPtr wParam, IntPtr lParam)
     {
         if (nCode >= 0)
-
         {
-
             int iwParam = wParam.ToInt32();
-
-
 
             if ((iwParam == WM_KEYDOWN || iwParam == WM_SYSKEYDOWN))
 

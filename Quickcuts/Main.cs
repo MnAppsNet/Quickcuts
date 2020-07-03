@@ -21,11 +21,10 @@ namespace Quickcuts
         private Point defaultArrowLocation;
         private Size OriginalSize;
         //Variables to open and close the panel :
-        KeyboardHook Hook;
+        private static KeyboardHook Hook;
         KeyboardHook.VKeys[] showShortcut = { KeyboardHook.VKeys.LCONTROL, KeyboardHook.VKeys.LSHIFT, KeyboardHook.VKeys.KEY_E }; 
         KeyboardHook.VKeys[] hideShortcut = { KeyboardHook.VKeys.LCONTROL, KeyboardHook.VKeys.LSHIFT, KeyboardHook.VKeys.KEY_Q };
         #endregion -----------------------------------------------------------------------
-
 
         public Main()
         { //Constructor
@@ -61,18 +60,11 @@ namespace Quickcuts
         List<KeyboardHook.VKeys> vKeys = new List<KeyboardHook.VKeys>();
         private void KeyDownHook(KeyboardHook.VKeys key)
         {
-            try
-            {
-                if (vKeys[vKeys.Count - 1] == key) return;
-            }
-            catch { }
-
+            bool ok;
             vKeys.Add(key);
-
-            if (vKeys.Count >= showShortcut.Length)
+            if (vKeys.Count == showShortcut.Length)
             {
-                bool ok = true;
-
+                ok = true;
                 //Check Show Panel
                 foreach (KeyboardHook.VKeys k in showShortcut)
                 {
@@ -88,7 +80,15 @@ namespace Quickcuts
                     ShowProjets();
                     GetShortcuts(Properties.Settings.Default.path);
                 }
-
+            }
+            else if (vKeys.Count > showShortcut.Length)
+            {
+                vKeys.Clear();
+                vKeys.Add(key);
+            }
+            
+            if (vKeys.Count == hideShortcut.Length)
+            {
                 //Check Hide Panel
                 ok = true;
                 foreach (KeyboardHook.VKeys k in hideShortcut)
@@ -105,8 +105,11 @@ namespace Quickcuts
                     HideProjects();
                     GetShortcuts(Properties.Settings.Default.path);
                 }
-
-                vKeys.RemoveAt(vKeys.Count - 1);
+            }
+            else if (vKeys.Count > showShortcut.Length)
+            {
+                vKeys.Clear();
+                vKeys.Add(key);
             }
         }
         private void KeyUpHook(KeyboardHook.VKeys key)
@@ -154,6 +157,8 @@ namespace Quickcuts
                 arrow.Location = defaultArrowLocation;
             }
             this.TopMost = check;
+            this.BringToFront();
+            this.Activate();
             Properties.Settings.Default.topMost = check;
             Properties.Settings.Default.Save();
         }
@@ -220,7 +225,6 @@ namespace Quickcuts
             process.StartInfo.WorkingDirectory = System.IO.Path.GetDirectoryName(ex);
             process.Start();
         }
-
         public string GetClickActionPath(string Path, string Click)
         {
             string ex = "";
@@ -235,7 +239,7 @@ namespace Quickcuts
         #region Events
         public void MouseClickEvent(object sender, MouseEventArgs e)
         {
-            if (!TopMost)
+            if (!this.TopMost)
                 this.SendToBack();
             PictureBox S = (PictureBox)sender;
 
@@ -298,7 +302,7 @@ namespace Quickcuts
             this.SetStyle(ControlStyles.SupportsTransparentBackColor, true);
             this.topMost(Properties.Settings.Default.topMost);
 
-            if (!TopMost)
+            if (!this.TopMost)
                 this.SendToBack();
 
             //KeyBoard Hook :
