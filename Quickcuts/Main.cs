@@ -22,8 +22,8 @@ namespace Quickcuts
         private Size OriginalSize;
         //Variables to open and close the panel :
         private static KeyboardHook Hook;
-        KeyboardHook.VKeys[] showShortcut = { KeyboardHook.VKeys.LCONTROL, KeyboardHook.VKeys.LSHIFT, KeyboardHook.VKeys.KEY_E }; 
-        KeyboardHook.VKeys[] hideShortcut = { KeyboardHook.VKeys.LCONTROL, KeyboardHook.VKeys.LSHIFT, KeyboardHook.VKeys.KEY_Q };
+        KeyboardHook.VKeys[] showShortcut = { KeyboardHook.VKeys.LCONTROL, KeyboardHook.VKeys.LSHIFT, KeyboardHook.VKeys.RIGHT }; 
+        //KeyboardHook.VKeys[] hideShortcut = { KeyboardHook.VKeys.LCONTROL, KeyboardHook.VKeys.LSHIFT, KeyboardHook.VKeys.KEY_Q };
         #endregion -----------------------------------------------------------------------
 
         public Main()
@@ -76,8 +76,16 @@ namespace Quickcuts
                 }
                 if (ok)
                 {
-                    ChangeArrow("<");
-                    ShowProjets();
+                    if (arrow.Tag.ToString() == ">")
+                    {
+                        ChangeArrow("<");
+                        ShowProjets();
+                    }
+                    else
+                    {
+                        ChangeArrow(">");
+                        HideProjects();
+                    }
                     GetShortcuts(Properties.Settings.Default.path);
                 }
             }
@@ -87,30 +95,30 @@ namespace Quickcuts
                 vKeys.Add(key);
             }
             
-            if (vKeys.Count == hideShortcut.Length)
-            {
-                //Check Hide Panel
-                ok = true;
-                foreach (KeyboardHook.VKeys k in hideShortcut)
-                {
-                    if (!vKeys.Contains(k))
-                    {
-                        ok = false;
-                        break;
-                    }
-                }
-                if (ok)
-                {
-                    ChangeArrow(">");
-                    HideProjects();
-                    GetShortcuts(Properties.Settings.Default.path);
-                }
-            }
-            else if (vKeys.Count > showShortcut.Length)
-            {
-                vKeys.Clear();
-                vKeys.Add(key);
-            }
+            //if (vKeys.Count == hideShortcut.Length)
+            //{
+            //    //Check Hide Panel
+            //    ok = true;
+            //    foreach (KeyboardHook.VKeys k in hideShortcut)
+            //    {
+            //        if (!vKeys.Contains(k))
+            //        {
+            //            ok = false;
+            //            break;
+            //        }
+            //    }
+            //    if (ok)
+            //    {
+            //        ChangeArrow(">");
+            //        HideProjects();
+            //        GetShortcuts(Properties.Settings.Default.path);
+            //    }
+            //}
+            //else if (vKeys.Count > showShortcut.Length)
+            //{
+            //    vKeys.Clear();
+            //    vKeys.Add(key);
+            //}
         }
         private void KeyUpHook(KeyboardHook.VKeys key)
         {
